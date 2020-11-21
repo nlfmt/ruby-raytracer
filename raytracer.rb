@@ -48,10 +48,10 @@ marble = Material.new(
   normal_strength: 1
 )
 white = Material.new(
-  diffuse: RED * 0.7,
-  specular: WHITE * 0.5,
+  diffuse: WHITE * 0.8,
+  specular: WHITE * 0.8,
   roughness: 0.2,
-  reflectivity: 0.05,
+  reflectivity: 0,
 )
 green = Material.new(
   diffuse: GREEN * 0.7,
@@ -60,10 +60,10 @@ green = Material.new(
   reflectivity: 0.3,
 )
 gp = Material.new(
-  diffuse: Color.new(50,50,50),
-  specular: WHITE * 0.7,
+  diffuse: WHITE * 0.8,#Color.new(50,50,50),
+  specular: WHITE * 0.05,
   roughness: 0.7,
-  reflectivity: 0.001,
+  reflectivity: 0,
 )
 cliffrock = Material.new(
   diffuse: "tex/rc_diffuse.tif",
@@ -134,6 +134,11 @@ warmlight2 = Light.new(
   pos: Vec3.new(0, 3, 1),
   strength: 6
 )
+testlight = Light.new(
+  color: Color.new(255,230,210),
+  pos: Vec3.new(1.5, 1.5, 1.5),
+  strength: 15
+)
 ###############################
 # Objects
 ###############################
@@ -161,7 +166,7 @@ back = Plane.new(
   mat: purple,
   normal: Vec3.new(0,0,-1)
 )
-box = [floor,left,right,top,back]
+box = [floor]#,left,right,top,back]
 s1 = Sphere.new(
   pos: Vec3.new(0, 0, 1.2),
   rad: 0.1,
@@ -181,7 +186,7 @@ s3 = Sphere.new(
 
 )
 s4 = Sphere.new(
-  pos: Vec3.new(0, 0, 1.5),
+  pos: Vec3.new(0, 0.15, 1.5),
   rad: 0.2,
   mat: white
 
@@ -202,13 +207,13 @@ dbgcam = Camera.new(
 )
 sc1 = Scene.new(
   objects: [s4, box].flatten, # , s2, s3, s4,
-  lights: [coldlight2, warmlight, rimlight],
+  lights: [testlight],#[coldlight2, warmlight, rimlight],
   filename: "scene1",
   cam: dbgcam, #cam,
   env: "tex/the_lost_city_4k.png"
 )
 
-engine = RenderEngine.new(feedback: nil)
+engine = RenderEngine.new(feedback: nil, shadow_samples: 120)
 puts "Loading finished"
 sleep(1)
 start = Time.now

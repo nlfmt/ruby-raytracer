@@ -19,7 +19,7 @@ class RenderEngine
 
   attr_accessor :MAX_DEPTH, :MIN_DISPLACE
 
-  def initialize(reflection_depth: 3, min_displace: 0.0001, shadow_samples: 5, feedback: nil)
+  def initialize(reflection_depth: 3, min_displace: 0.0001, shadow_samples: 60, feedback: nil)
     @MAX_DEPTH = reflection_depth
     @MIN_DISPLACE = min_displace
     @SHADOW_SAMPLES = shadow_samples
@@ -143,14 +143,12 @@ class RenderEngine
     mat = obj_hit.mat
     uvs = uvs((hit_pos - obj_hit.p).normalize)
 
-    #dbgn = (hit_pos - obj_hit.p).normalize * Vec3.new(1,1,-1) + Vec3.new(1,1,1)
-
     to_cam = scene.cam.pos - hit_pos
     specular_k = 250
 
     specular = Color.new
     emission = Color.new
-    #puts "START"
+
     scene.lights.each do |light|
       to_light = light.p - hit_pos
 
@@ -165,7 +163,7 @@ class RenderEngine
       # end
       shadow = 1
       @SHADOW_SAMPLES.times do
-        deviation = Vec3.new(rand(),rand(),rand()).normalize * 0.3
+        deviation = Vec3.new(rand(),rand(),rand()).normalize * 0.6
         shadowray = Ray.new(hit_pos, to_light + deviation)
         scene.objects.each do |obj|
           dist = obj.intersect(shadowray)
@@ -178,12 +176,12 @@ class RenderEngine
 
       if shadow != 0
         # Sum of all light reaching this point
-        emission = emission + (light.color(hit_pos) * dot(normal, to_light.normalize).clamp(0,1))
+        emission = (emission + (light.color(hit_pos) * dot(normal, to_light.normalize).clamp(0,1))) * shadow
 
         # Specular (Light Glow Effect)
         half_vector = (to_light + to_cam).normalize
         falloff = dot(normal, half_vector).clamp(0,1) ** specular_k
-        specular = specular + (light.color(hit_pos) * mat.specular(uvs) * falloff)
+        specular = (specular + (light.color(hit_pos) * mat.specular(uvs) * falloff)) * shadow
       end
     end
 
